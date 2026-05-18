@@ -11,10 +11,12 @@ from .stare import STAREDataset
 from .voc import PascalVOCDataset
 from .mapillary import MapillaryDataset
 from .cocostuff import CocoStuff
+from .task2_semantic_seg import Task2SemanticSegDataset
 
 __all__ = [
     'CustomDataset', 'build_dataloader', 'ConcatDataset', 'RepeatDataset',
     'DATASETS', 'build_dataset', 'PIPELINES', 'CityscapesDataset',
     'PascalVOCDataset', 'ADE20KDataset', 'PascalContextDataset',
-    'ChaseDB1Dataset', 'DRIVEDataset', 'HRFDataset', 'STAREDataset', 'MapillaryDataset', 'CocoStuff'
+    'ChaseDB1Dataset', 'DRIVEDataset', 'HRFDataset', 'STAREDataset',
+    'MapillaryDataset', 'CocoStuff', 'Task2SemanticSegDataset'
 ]

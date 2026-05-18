@@ -6,7 +6,7 @@ import torch
 from mmcv.parallel import MMDataParallel, MMDistributedDataParallel
 from mmcv.runner import build_optimizer, build_runner
 
-from mmseg.core import DistEvalHook, EvalHook
+from mmseg.core import DistEvalHook, EvalHook, ExtraMetricsHook
 from mmseg.datasets import build_dataloader, build_dataset
 from mmseg.utils import get_root_logger
 
@@ -107,6 +107,35 @@ def train_segmentor(model,
         eval_cfg['by_epoch'] = cfg.runner['type'] != 'IterBasedRunner'
         eval_hook = DistEvalHook if distributed else EvalHook
         runner.register_hook(eval_hook(val_dataloader, **eval_cfg))
+
+        # optional: extra metrics (val_loss + train_mIoU on small subsets)
+        extra_cfg = cfg.get('extra_metrics')
+        if extra_cfg is not None:
+            val_loss_dataset = build_dataset(cfg.data.val_loss)
+            val_loss_dataloader = build_dataloader(
+                val_loss_dataset,
+                samples_per_gpu=1,
+                workers_per_gpu=cfg.data.workers_per_gpu,
+                dist=distributed,
+                shuffle=False)
+            train_eval_dataset = build_dataset(
+                cfg.data.train_eval, dict(test_mode=True))
+            train_eval_dataloader = build_dataloader(
+                train_eval_dataset,
+                samples_per_gpu=1,
+                workers_per_gpu=cfg.data.workers_per_gpu,
+                dist=distributed,
+                shuffle=False)
+            runner.register_hook(
+                ExtraMetricsHook(
+                    val_loss_dataloader,
+                    train_eval_dataloader,
+                    interval=extra_cfg.get('interval', eval_cfg['interval']),
+                    n_val_samples=extra_cfg.get('n_val_samples', 200),
+                    n_train_samples=extra_cfg.get('n_train_samples', 200),
+                    num_classes=cfg.model.decode_head.num_classes,
+                    ignore_index=extra_cfg.get('ignore_index', 255),
+                    iters_per_epoch=len(data_loaders[0])))
 
     if cfg.resume_from:
         runner.resume(cfg.resume_from)

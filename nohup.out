@@ -1,0 +1,12 @@
+Traceback (most recent call last):
+  File "tools/train.py", line 225, in <module>
+    main()
+  File "tools/train.py", line 126, in main
+    cfg = Config.fromfile(args.config)
+  File "/home/josenxia/.conda/envs/segformer/lib/python3.8/site-packages/mmcv/utils/config.py", line 250, in fromfile
+    cfg_dict, cfg_text = Config._file2dict(filename,
+  File "/home/josenxia/.conda/envs/segformer/lib/python3.8/site-packages/mmcv/utils/config.py", line 123, in _file2dict
+    check_file_exist(filename)
+  File "/home/josenxia/.conda/envs/segformer/lib/python3.8/site-packages/mmcv/utils/path.py", line 23, in check_file_exist
+    raise FileNotFoundError(msg_tmpl.format(filename))
+FileNotFoundError: file "/home/lq/Projects_qin/surgical_semantic_seg/benmarking_algorithms/SegFormer/ " does not exist
